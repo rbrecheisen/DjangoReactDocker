@@ -8,17 +8,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     networks:
-      - backend-network
+      - backend_network
 
   backend:
     build: ./backend
     container_name: backend
     environment:
+      DATA_DIR: /data
       DJANGO_SECRET_KEY: supersecretkey
       DJANGO_ALLOWED_HOSTS: "*"
       DATABASE_URL: postgres://django_user:django_pass@db:5432/django_db
     networks:
-      - backend-network
+      - backend_network
     depends_on:
       - db
 
@@ -28,6 +29,12 @@ services:
     ports:
       - "80:80"
     networks:
-      - backend-network
+      - backend_network
     depends_on:
       - backend
+
+volumes:
+  postgres_data:
+
+networks:
+  backend_network:
