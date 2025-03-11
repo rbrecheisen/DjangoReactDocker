@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: django_db
+      POSTGRES_USER: django_user
+      POSTGRES_PASSWORD: django_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - backend-network
+
+  backend:
+    build: ./backend
+    container_name: backend
+    environment:
+      DJANGO_SECRET_KEY: supersecretkey
+      DJANGO_ALLOWED_HOSTS: "*"
+      DATABASE_URL: postgres://django_user:django_pass@db:5432/django_db
+    networks:
+      - backend-network
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    networks:
+      - backend-network
+    depends_on:
+      - backend
